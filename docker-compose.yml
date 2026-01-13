@@ -1,0 +1,9 @@
+services:
+  adhd-stimulants-pk:
+    build: .
+    container_name: adhd-stimulants-pk
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    labels:
+      - "com.docker.compose.project=adhd-stimulants-pk"

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Farmacocinética - Estimulantes TDAH</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .medication-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .medication-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .med-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .med-title-section {
+            flex: 1;
+        }
+
+        .medication-card label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 1.05em;
+        }
+
+        .medication-card input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .pill-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .pill-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .pill-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .pill-visual {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .pill-visual.round {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .pill-visual.capsule {
+            width: 50px;
+            height: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .pill-visual.oblong {
+            width: 50px;
+            height: 22px;
+            border-radius: 11px;
+            border: 1px solid #ddd;
+        }
+
+        .med-info {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #6c757d;
+            line-height: 1.4;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .med-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f4f8;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+
+        .detail-item {
+            font-size: 0.85em;
+            color: #34495e;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .detail-item strong {
+            color: #2c3e50;
+        }
+
+        .dose-selector-container {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .dose-label {
+            display: inline-block;
+            font-size: 0.9em;
+            color: #5a6c7d;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+
+        .dose-select {
+            padding: 6px 12px;
+            font-size: 0.95em;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.2s;
+        }
+
+        .dose-select:hover {
+            border-color: #2980b9;
+            background: #f8f9fa;
+        }
+
+        .dose-select:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .ir-equivalent {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #27ae60;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 600px;
+            margin-bottom: 30px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .legend-custom {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .info-panel {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .info-panel h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .threshold-controls {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .threshold-control {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 250px;
+        }
+
+        .threshold-control label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .threshold-control input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .threshold-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .weight-control {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+        }
+
+        .weight-control label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weight-input {
+            padding: 10px;
+            font-size: 1.1em;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .weight-input:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .auto-dose-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .auto-dose-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .auto-dose-toggle label {
+            cursor: pointer;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .vespertino-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .vespertino-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .vespertino-control label {
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚕️ Comparador de Farmacocinética</h1>
+        <p class="subtitle">Estimulantes para el Tratamiento del TDAH</p>
+
+        <div class="chart-container">
+            <canvas id="pkChart"></canvas>
+        </div>
+
+        <div class="legend-custom" id="customLegend"></div>
+
+        <div class="threshold-controls">
+            <div class="weight-control">
+                <label>
+                    ⚖️ Peso del Paciente: <span class="threshold-value" id="weightValue">20 kg</span>
+                </label>
+                <input type="number" id="patientWeight" class="weight-input" 
+                       min="10" max="200" value="20" step="1">
+                <small style="color: #7f8c8d;">Rango: 10-200 kg</small>
+                <div class="auto-dose-toggle">
+                    <input type="checkbox" id="autoDoseToggle" checked>
+                    <label for="autoDoseToggle">Ajustar dosis automáticamente (0.5 mg/kg MPH IR)</label>
+                </div>
+            </div>
+
+            <div class="threshold-control">
+                <label>
+                    <span style="color: #27ae60;">━━━</span>
+                    Umbral Terapéutico: <span class="threshold-value" id="therapeuticValue">30%</span>
+                </label>
+                <input type="range" id="therapeuticSlider" min="0" max="100" value="30" step="5">
+                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Posición relativa en el eje Y (0-100%)</small>
+            </div>
+            
+            <div class="threshold-control">
+                <label>
+                    <span style="color: #c0392b;">━━━</span>
+                    Umbral Efectos Secundarios: <span class="threshold-value" id="sideEffectsValue">80%</span>
+                </label>
+                <input type="range" id="sideEffectsSlider" min="0" max="100" value="80" step="5">
+                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Posición relativa en el eje Y (0-100%)</small>
+            </div>
+
+            <div class="vespertino-control">
+                <input type="checkbox" id="rubifenVespertino">
+                <label for="rubifenVespertino">Rubifen® vespertino (16h)</label>
+            </div>
+        </div>
+
+        <div class="controls" id="medicationControls"></div>
+
+        <div class="info-panel">
+            <h3>ℹ️ Información</h3>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="medicacionTDAH.png" alt="Medicamentos para TDAH" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            </div>
+            
+            <p><strong>Tipos de formulaciones de Metilfenidato según Banaschewski et al. 2006:</strong></p>
+            <p>• <strong>Tipo 1 (22:78)</strong>: Concerta®, Atenza®, Rubicrono® - Mayor efecto vespertino (4-12h)</p>
+            <p>• <strong>Tipo 2 (30:70)</strong>: Equasym® - Efecto balanceado (~8h)</p>
+            <p>• <strong>Tipo 3 (50:50)</strong>: Medikinet®, Rubifen Prolong® - Mayor efecto matutino (~8h)</p>
+            <p style="margin-top: 10px;"><strong>💊 Equivalencia de dosis:</strong> Las comparaciones se basan en el componente IR (liberación inmediata) de cada formulación. Lisdexanfetamina se representa con equivalencia aproximada de 1:2 respecto a metilfenidato (30mg LDX ≈ 60mg MTF).</p>
+            <p style="margin-top: 10px;"><strong>⚖️ Ajuste por peso:</strong> Las concentraciones se expresan en mg/kg para permitir comparaciones entre pacientes de diferentes pesos corporales.</p>
+            <p style="margin-top: 10px;"><strong>🎯 Dosis automáticas:</strong> Con el ajuste automático activado, el sistema calcula dosis equivalentes a 0.5 mg/kg de metilfenidato IR, redondeando a la presentación comercial más cercana. Puedes desactivar esta opción y ajustar las dosis manualmente.</p>
+        </div>
+
+        <div class="info-panel" style="margin-top: 30px;">
+            <h3>📚 Referencias Bibliográficas</h3>
+            <p style="margin-top: 10px; line-height: 1.8;">
+                1. <strong>Banaschewski T, et al.</strong> (2006). Long-acting medications for the hyperkinetic disorders: A systematic review and European treatment guideline. <em>European Child & Adolescent Psychiatry</em>, 15(8), 476-495.<br><br>
+                2. <strong>Nottinghamshire Area Prescribing Committee</strong> (2024). Protocol for Switching of Methylphenidate Formulations During Shortages by Specialists. Version 3.1.<br><br>
+                3. <strong>Agencia Española de Medicamentos y Productos Sanitarios (AEMPS)</strong> (2024). Recomendaciones de prescripción ante los problemas de suministro de medicamentos que contienen metilfenidato en forma de comprimidos de liberación prolongada. Disponible en: <a href="https://www.aemps.gob.es/informa/recomendaciones-de-prescripcion-de-la-aemps-ante-los-problemas-de-suministro-de-medicamentos-que-contienen-como-principio-activo-metilfenidato-en-forma-de-comprimidos-de-liberacion-prolongada/" target="_blank" style="color: #2980b9; text-decoration: underline;">www.aemps.gob.es</a><br><br>
+                4. <strong>Spencer TJ, et al.</strong> (2006). Pharmacotherapy of attention-deficit hyperactivity disorder across the life cycle. <em>Journal of the American Academy of Child & Adolescent Psychiatry</em>, 35(4), 409-432.<br><br>
+                5. <strong>Volkow ND, Swanson JM</strong> (2013). Clinical practice: Adult attention deficit-hyperactivity disorder. <em>New England Journal of Medicine</em>, 369(20), 1935-1944.<br><br>
+                6. <strong>Castells X, et al.</strong> (2011). Efficacy of methylphenidate for adults with attention-deficit hyperactivity disorder: A meta-regression analysis. <em>CNS Drugs</em>, 25(2), 157-169.
+            </p>
+        </div>
+    </div>
+
+    <script src="app.js?v=15"></script>
+</body>
+</html>
