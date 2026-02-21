@@ -324,3 +324,24 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
 }
+
+/* Override ultra-específico para estilos inline */
+html body {
+}
+
+html body h1,
+html body h2,
+html body h3,
+html body h4,
+html body h5,
+html body h6 {
+}
+
+/* Forzar en el contenedor también */
+.container h1,
+.container h2,
+.container h3,
+.container h4,
+.container h5,
+.container h6 {
+}
