@@ -327,6 +327,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Override ultra-específico para estilos inline */
 html body {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
 }
 
 html body h1,
@@ -335,6 +336,7 @@ html body h3,
 html body h4,
 html body h5,
 html body h6 {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
 }
 
 .container h1,
@@ -343,4 +345,5 @@ html body h6 {
 .container h4,
 .container h5,
 .container h6 {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
 }
