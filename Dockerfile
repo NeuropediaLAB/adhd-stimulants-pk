@@ -5,6 +5,7 @@ COPY index.html /usr/share/nginx/html/
 COPY app.js /usr/share/nginx/html/
 COPY medicacionTDAH.png /usr/share/nginx/html/
 COPY images/ /usr/share/nginx/html/images/
+COPY assets /usr/share/nginx/html/assets
 
 # Exponer puerto 80
 EXPOSE 80

@@ -394,7 +394,6 @@
             margin: 0;
         }
     </style>
-    <link rel="stylesheet" href="assets/neuropedialab-theme.css">
 </head>
 <body>
     <div class="container">
