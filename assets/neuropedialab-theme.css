@@ -347,3 +347,27 @@ html body h6 {
 .container h6 {
   font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
 }
+
+/* Super override - máxima especificidad posible */
+html body h1:where(h1),
+html body h2:where(h2),
+html body h3:where(h3),
+html body h4:where(h4),
+html body h5:where(h5),
+html body h6:where(h6) {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
+}
+
+html body .container h1:where(h1),
+html body .container h2:where(h2),
+html body .container h3:where(h3),
+html body .container h4:where(h4),
+html body .container h5:where(h5),
+html body .container h6:where(h6) {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
+}
+
+/* Forzar en todos los contextos posibles */
+* h1, * h2, * h3, * h4, * h5, * h6 {
+  font-family: "NonBreakingSpaceOverride", "Hoefler Text", "Baskerville Old Face", Garamond, "Times New Roman", serif !important;
+}
